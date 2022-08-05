@@ -1,15 +1,11 @@
 package net.iponweb.benchmarks;
 
-import jdk.incubator.vector.DoubleVector;
-import jdk.incubator.vector.FloatVector;
-import jdk.incubator.vector.VectorOperators;
-import jdk.incubator.vector.VectorSpecies;
+import jdk.incubator.vector.*;
 
 public class VectorizedDotProduct {
     private static final VectorSpecies<Float> SPECIES = FloatVector.SPECIES_PREFERRED;
-    private static final VectorSpecies<Double> DOUBLE_SPECIES = DoubleVector.SPECIES_PREFERRED;
 
-    public static double dot(float[] vd1, float[] vd2) {
+    public static double dotDense(float[] vd1, float[] vd2) {
         var product = 0f;
 
         var upperBound = SPECIES.loopBound(vd1.length);
@@ -28,8 +24,16 @@ public class VectorizedDotProduct {
         return product;
     }
 
-    public static double dot(int[] indices, float[] values, float[] dense) {
+    public static double dotSparse(int[] indices, float[] values, float[] dense) {
         return multiplySimpleVectors(indices, values, dense, FloatVector.zero(SPECIES));
+    }
+
+    public static double dotScalar(int[] onesIndices, int[] indices, float[] values, float[] dense) {
+        float sum = 0f;
+
+        for (var i : onesIndices) sum += dense[i];
+        for (var i = 0; i < indices.length; i++) sum += dense[i] * values[i];
+        return sum;
     }
 
     public static double dotWithOnes(int[] onesIndices, int[] indices, float[] values, float[] dense) {

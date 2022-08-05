@@ -46,6 +46,6 @@ public class PlainArrays {
 
     @Benchmark
     public float vector() {
-        return (float) VectorizedDotProduct.dot(denseVector1, denseVector2);
+        return (float) VectorizedDotProduct.dotDense(denseVector1, denseVector2);
     }
 }
