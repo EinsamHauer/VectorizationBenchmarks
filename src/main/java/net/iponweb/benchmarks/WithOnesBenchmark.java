@@ -9,6 +9,7 @@ import static net.iponweb.benchmarks.Utils.*;
 @BenchmarkMode(Mode.Throughput)
 @OutputTimeUnit(TimeUnit.SECONDS)
 @State(Scope.Benchmark)
+@Warmup(iterations = 2)
 @Fork(value = 1, jvmArgsPrepend = {
         "--add-modules=jdk.incubator.vector",
         "-Djdk.incubator.vector.VECTOR_ACCESS_OOB_CHECK=0"
@@ -31,12 +32,12 @@ public class WithOnesBenchmark {
     public float onesFraction;
 
     @Param({
-            "0.05",
+            "0.05"/*,
             "0.01",
             "0.02",
             "0.04",
             "0.08",
-            "0.16"/*,
+            "0.16",
             "0.32",
             "0.64",
             "0.7",
@@ -58,8 +59,8 @@ public class WithOnesBenchmark {
     public float scalar() {
         float sum = 0f;
 
-        for (var i : sparseVector.onesIndices) sum += denseVector[i];
-        for (var i = 0; i < sparseVector.indices.length; i++) sum += denseVector[i]* sparseVector.values[i];
+        for (var i : sparseVector.onesIndices) sum += denseVector[sparseVector.onesIndices[i]];
+        for (var i = 0; i < sparseVector.indices.length; i++) sum += denseVector[sparseVector.indices[i]]* sparseVector.values[i];
         return sum;
     }
 
