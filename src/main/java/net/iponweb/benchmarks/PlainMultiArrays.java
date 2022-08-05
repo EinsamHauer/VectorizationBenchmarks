@@ -10,9 +10,10 @@ import static net.iponweb.benchmarks.Utils.newFloatVector;
 @OutputTimeUnit(TimeUnit.SECONDS)
 @State(Scope.Benchmark)
 @Fork(value = 1, jvmArgsPrepend = {
-        "--add-modules=jdk.incubator.vector"
+        "--add-modules=jdk.incubator.vector",
+        "-Xmx4g"
 })
-public class PlainArrays {
+public class PlainMultiArrays {
 
     @Param({
             "32768",
@@ -26,26 +27,38 @@ public class PlainArrays {
     })
     public int size;
 
+    @Param({
+            "100",
+    })
+    public int numberOfVectors;
+
     public float[] denseVector1;
-    public float[] denseVector2;
+    public float[][] denseVector2;
 
     @Setup(Level.Trial)
     public void init() {
         denseVector1 = newFloatVector(size);
-        denseVector2 = newFloatVector(size);
+        denseVector2 = new float[numberOfVectors][size];
+        for (var i = 0; i < numberOfVectors; i++) denseVector2[i] = newFloatVector(size);
     }
 
     @Benchmark
     public float scalar() {
         float sum = 0f;
-        for (int i = 0; i < size; ++i) {
-            sum += denseVector1[i] * denseVector2[i];
+        for (var k = 0; k < numberOfVectors; k++) {
+            for (int i = 0; i < size; ++i) {
+                sum += denseVector1[i] * denseVector2[k][i];
+            }
         }
         return sum;
     }
 
     @Benchmark
     public float vector() {
-        return (float) VectorizedDotProduct.dotDense(denseVector1, denseVector2);
+        float sum = 0f;
+        for (var k = 0; k < numberOfVectors; k++) {
+            sum += VectorizedDotProduct.dotDense(denseVector1, denseVector2[k]);
+        }
+        return sum;
     }
 }
