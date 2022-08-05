@@ -60,7 +60,7 @@ public class WithOnesBenchmark {
         float sum = 0f;
 
         for (var i : sparseVector.onesIndices) sum += denseVector[i];
-        for (var i = 0; i < sparseVector.indices.length; i++) sum += denseVector[sparseVector.indices[i]]* sparseVector.values[i];
+        for (var i = 0; i < sparseVector.indices.length; i++) sum += denseVector[sparseVector.indices[i]] * sparseVector.values[i];
         return sum;
     }
 
