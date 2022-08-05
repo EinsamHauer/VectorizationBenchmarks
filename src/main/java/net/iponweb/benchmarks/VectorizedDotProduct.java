@@ -28,14 +28,6 @@ public class VectorizedDotProduct {
         return multiplySimpleVectors(indices, values, dense, FloatVector.zero(SPECIES));
     }
 
-    public static double dotScalar(int[] onesIndices, int[] indices, float[] values, float[] dense) {
-        float sum = 0f;
-
-        for (var i : onesIndices) sum += dense[i];
-        for (var i = 0; i < indices.length; i++) sum += dense[i] * values[i];
-        return sum;
-    }
-
     public static double dotWithOnes(int[] onesIndices, int[] indices, float[] values, float[] dense) {
         var sum = FloatVector.zero(SPECIES);
         var product = 0f;
@@ -51,28 +43,6 @@ public class VectorizedDotProduct {
 
         for (; i < onesIndices.length; i++) {
             product += dense[onesIndices[i]];
-        }
-
-        return product + multiplySimpleVectors(indices, values, dense, sum);
-    }
-
-    public static double dotWithFreqs(float[] freqValues, int[][] freqIndices, int[] indices, float[] values, float[] dense) {
-        var sum = FloatVector.zero(SPECIES);
-        var product = 0f;
-
-        // process frequent values first
-        for (var i = 0; i < freqIndices.length; i++) {
-            var upperBound = SPECIES.loopBound(freqIndices[i].length);
-            var j = 0;
-
-            for (; j < upperBound; j += SPECIES.length()) {
-                var v = FloatVector.fromArray(SPECIES, dense, 0, freqIndices[i], j);
-                sum = sum.add(v.mul(freqValues[i]));
-            }
-
-            for (; j < freqIndices[i].length; j++) {
-                product += freqValues[i] * dense[freqIndices[i][j]];
-            }
         }
 
         return product + multiplySimpleVectors(indices, values, dense, sum);
