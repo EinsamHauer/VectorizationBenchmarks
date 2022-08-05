@@ -50,7 +50,7 @@ public class SparseBenchmark {
     public float scalar() {
         float sum = 0f;
 
-        for (var i = 0; i < sparseVector.indices.length; i++) sum += Math.fma(denseVector[i], sparseVector.values[i], sum);
+        for (var i = 0; i < sparseVector.indices.length; i++) sum += denseVector[i] * sparseVector.values[i];
         return sum;
     }
 
